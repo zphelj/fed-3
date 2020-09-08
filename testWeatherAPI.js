@@ -1,5 +1,5 @@
 const fetch = require('node-fetch');
-
+/*
 const getMyWeather = async (zipcode) => {
   let OpenWeatherAPIKey = '745af18b0ea3615649040c19beaba79f';
   const response = await fetch(`http://api.openweathermap.org/data/2.5/weather?zip=${zipcode},&appid=${OpenWeatherAPIKey}`);
@@ -9,3 +9,13 @@ const getMyWeather = async (zipcode) => {
 }
 
 getMyWeather('75019')
+*/
+
+const testAll = async () => {
+  const response = await fetch(`http://localhost:3000/all`);
+  const myJson = await response.json(); //extract JSON from the http response
+  // do something with myJson
+  console.log(myJson);
+}
+
+testAll();

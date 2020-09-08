@@ -35,16 +35,10 @@ app.get('/all', (req, res) => {
 
 function addPostData(req,res) {
   console.log('POST ADD:');
-  try { // if for any reason a post came improperly formatted an exception could occur
-    projectData.temperature = req.body.temperature;
-    projectData.date = req.body.date;
-    projectData.userResponse = req.body.userResponse;
-  }
-  catch(error) {
-    console.log("ERROR (addPostData):", error);
-    // at this point carry on
-  }
-  res.send(JSON.stringify('POSTED'));
+  projectData.temperature = req.body.temperature;
+  projectData.date = req.body.date;
+  projectData.userResponse = req.body.userResponse;
+  res.send(projectData);
 }
 
 // Handle POST '/add'

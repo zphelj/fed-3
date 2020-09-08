@@ -6,8 +6,6 @@ const openWeatherBaseURL = 'http://api.openweathermap.org/data/2.5/weather';
 const userZip = document.getElementById('zip');
 const userFeelings = document.getElementById('feelings')
 
-// const { get } = require('http');
-
 // Create a new date instance dynamically with JS
 let d = new Date();
 let currentDate = d.getMonth()+'.'+ d.getDate()+'.'+ d.getFullYear();
@@ -16,56 +14,62 @@ let currentDate = d.getMonth()+'.'+ d.getDate()+'.'+ d.getFullYear();
 document.getElementById("generate").addEventListener("click", userAdd);
 
 /* Function called by event listener */
-function userAdd() {
+function userAdd() {  // proper chaining is very important here or your results will be out of sync
   weatherForZip(`${openWeatherBaseURL}?zip=${userZip.value},&appid=${OpenWeatherAPIKey}`)
-    .then(postData(`${serverURLroot}/add`, {temperature: '300', date: currentDate, userResponse: userFeelings.value}))
-      .then(UpdatePage());
+    .then(function(data) { // seems to be required for nested promises and exposing data in this fashion
+      // console.log('WeatherData = ', data.main.temp);
+      postData(`${serverURLroot}/add`, {temperature: data.main.temp, date: currentDate, userResponse: userFeelings.value});
+    })
+    .then(() => UpdatePage()); // the arrow function syntax is required - breaks chain otherwise
 };
 
-/* function to get the weather data */
 // get the weather info for zip
-const weatherForZip = async (url='') =>{
+const weatherForZip = async (url='') => {
+  console.log('Requesting Weather');
   const response = await fetch(url);
   // console.log('response', response);
   try {
-    // Transform into JSON
     weatherData = await response.json();
-    // console.log('weatherData', weatherData);
+    console.log('Returned Weather Data obj = ', weatherData);
+    return weatherData;
   }
   catch(error) {
-    console.log('ERROR useradd(): ', error);
+    console.log('ERROR weatherForZip(): ', error);
     // Log and carry on
   };
 };
 
 /* Function to POST data to server */
 const postData = async (url='', data = {})=>{
+  console.log('POSTING: ', JSON.stringify(data));
   const response = await fetch(url, {
     method: 'POST',
     credentials: 'same-origin',
     headers: {
         'Content-Type': 'application/json',
     },
-    body: JSON.stringify(data), // body data type must match "Content-Type" header
+    body: JSON.stringify(data),
   });
 
   try {
     const newData = await response.json();
+    // don't care about the response in this scenario so carry on
   }catch(error) {
     console.log('ERROR POST: ', error);
+    // log error and carry on
   }
 };
 
 /* GET Project Data from server and update the page */
 const UpdatePage = async () => {
+  // console.log('Update Page start');
   const request = await fetch(`${serverURLroot}/all`);
   try {
     const allData = await request.json();
-    console.log('allData: ', allData);
     console.log('Update Page with: ', allData);
-    document.getElementById('temp').innerHTML = `<span class="entry-item">Temperature: </span>${allData.temperature}`;
-    document.getElementById('date').innerHTML = `<span class="entry-item">Date: </span>${allData.date}`;
-    document.getElementById('content').innerHTML = `<span class="entry-item">You feel: </span>${allData.userResponse}`;
+    document.getElementById('temp').innerHTML = `Temperature: ${allData.temperature}`;
+    document.getElementById('date').innerHTML = `Date: ${allData.date}`;
+    document.getElementById('content').innerHTML = `User Feelings: ${allData.userResponse}`;
   }
   catch(error) {
     console.log('ERROR: UpdatePage(): ', error);

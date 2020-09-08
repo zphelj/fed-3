@@ -15,7 +15,7 @@ document.getElementById("generate").addEventListener("click", userAdd);
 
 /* Function called by event listener */
 function userAdd() {  // proper chaining is very important here or your results will be out of sync
-  weatherForZip(`${openWeatherBaseURL}?zip=${userZip.value},&appid=${OpenWeatherAPIKey}`)
+  weatherForZip(`${openWeatherBaseURL}?zip=${userZip.value},&appid=${OpenWeatherAPIKey}&units=imperial`)
     .then(function(data) { // seems to be required for nested promises and exposing data in this fashion
       // console.log('WeatherData = ', data.main.temp);
       postData(`${serverURLroot}/add`, {temperature: data.main.temp, date: currentDate, userResponse: userFeelings.value});
